@@ -1,0 +1,1 @@
+print(f"A: {A_points} p. / B: {B_points} p. / C: {C_points} p. / ", end="")
