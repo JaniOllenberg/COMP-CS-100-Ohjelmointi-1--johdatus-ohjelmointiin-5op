@@ -10,7 +10,9 @@ def are_all_members_same(list_to_check):
     :param: list
     :return: True or False
     """
-    first_value = list_to_check[1]
+    if len(list_to_check) == 0:
+        return True
+    first_value = list_to_check[0]
     for i in list_to_check:
         if i != first_value:
             return False
@@ -18,7 +20,7 @@ def are_all_members_same(list_to_check):
 def main():
     print(are_all_members_same([42, 42, 42, 43, 42]))
     print(are_all_members_same([1,1,1,1,1]))
-    
+    print(are_all_members_same([]))
 
 if __name__ == "__main__":
     main()
