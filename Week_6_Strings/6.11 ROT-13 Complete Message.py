@@ -61,6 +61,7 @@ def read_message():
 def main():
     print("Enter text rows to the message. Quit by entering an empty row.")
     messages = read_message()
+    print("ROT13:")
     for i in messages:
         print(row_encryption(i))
     # print(encrypted)
