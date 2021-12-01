@@ -28,6 +28,6 @@ def main():
             else:
                 print(f"Error: {query} is unknown.")
                 continue
-            print(f"The price of {query} is: {price}")
+            print(f"The price of {query} is {price:.2f} e")
 if __name__ == "__main__":
     main()
