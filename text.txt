@@ -1,4 +1,2 @@
-1 hey
-2 write
-3 this text
-4 toa file
+1 hi 
+2 j

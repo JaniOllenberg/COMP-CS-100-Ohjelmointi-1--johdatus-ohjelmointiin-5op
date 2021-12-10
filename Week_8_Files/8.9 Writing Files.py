@@ -30,5 +30,6 @@ def main():
         print(f"{line_number} {i}", file=file)
         line_number += 1
     print(f"File {filename} has been written.")
+    file.close()
 if __name__ == "__main__":
     main()
