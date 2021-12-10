@@ -1,4 +1,4 @@
-essi 5
+essi
 pietari 9
 essi 2
 pietari 10

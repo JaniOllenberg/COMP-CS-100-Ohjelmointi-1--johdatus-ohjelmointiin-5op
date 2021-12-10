@@ -1,0 +1,9 @@
+mopo 7
+juna 3
+auto 6
+mopo 8
+juna 1
+mopo 1
+auto 5
+auto 1
+mopo 2
