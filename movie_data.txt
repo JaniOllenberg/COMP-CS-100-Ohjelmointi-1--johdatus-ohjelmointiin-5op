@@ -1,0 +1,4 @@
+Full Metal Jacket;director=Stanley Kubrick;year=1987
+Drive;year=2011;director=Nicolas Winding Refn
+Alien;genres=Horror, Sci-Fi;year=1979
+Blade Runner;imdb_score=8.1
