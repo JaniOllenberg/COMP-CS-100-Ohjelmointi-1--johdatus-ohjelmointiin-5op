@@ -1,0 +1,46 @@
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_10/10_intro/
+
+It may be abstract, such as a fractional number, or imaginary, such as an orch. 
+-orc? a fictional humanoid monster like a goblin
+
+The previously mentioned examples of concepts – dog, fractional number, orch and person – are nouns. 
+-orc
+
+Ensimmäinen olio saa arvot "Onni Ohjelmoija" ja 15000 ja siihen liitetään viite olli.
+-viite onni.
+
+Edellisessä esimerkissä vain stuart-olion tila muuttuu make_payment-metodin kutsun seurauksena.
+-onni-olion, kutsu oli onni.make_payment(3000)
+
+Pythonissa kaikki tiedot ovat lopulta olioita, jota ohjelmoinnin opiskelu ei kävisi tarpeettoman vaikeaksi kurssin alussa.
+-jotta
+
+--------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_10/10_luokan_toteuttaminen/
+
+# Code lines hidden here as the are irrelevant to this example.
+-they
+
+---------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_10/10_bussilippuesimerkki/
+
+The passengers (and therefore the tickets) are divided in three categories: child, student, and adult. 
+-into
+
+:raises: ValueError, if saldo or ticket_type is errorneous.
+-erroneous
+
+# Student does nothave enough money to travel,
+-not have
+
+Getters are methods which return the value of an attrbibute. In out Ticket class an example of a getter method is:
+-attribute, our
+
+the purpose of methods is the hide the implementation (i.e. attributes) from the programmer.
+-to hide
+
+Conceptually the most interesting thing in the example is how we succeeded in hiding the implemantation
+-implementation
+
+As it happened that all the error considions in the example
+-conditions
