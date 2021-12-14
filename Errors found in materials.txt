@@ -44,3 +44,18 @@ Conceptually the most interesting thing in the example is how we succeeded in hi
 
 As it happened that all the error considions in the example
 -conditions
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_10/10_omista_olioista/
+
+olivat oliot sitten Pythonin tai ohjelmoijan omist luokista.
+-omista
+
+Luokan liittymä koostuu näin ollen kaikista luokaan määritellyistä metodeista.
+-luokkaan
+
+# attached the object to have it in the main function.
+-attached to the object
+
+tulostetaan olion milentila molempia viitteitä käyttäen.
+-mielentila
