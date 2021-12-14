@@ -1,10 +1,10 @@
 https://plus.tuni.fi/comp.cs.100/mooc/rounds_10/10_intro/
 
 It may be abstract, such as a fractional number, or imaginary, such as an orch. 
--orc? a fictional humanoid monster like a goblin
+-orc(goblin)
 
 The previously mentioned examples of concepts – dog, fractional number, orch and person – are nouns. 
--orc
+-orc(goblin)
 
 Ensimmäinen olio saa arvot "Onni Ohjelmoija" ja 15000 ja siihen liitetään viite olli.
 -viite onni.
@@ -59,3 +59,9 @@ Luokan liittymä koostuu näin ollen kaikista luokaan määritellyistä metodeis
 
 tulostetaan olion milentila molempia viitteitä käyttäen.
 -mielentila
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_11/11_olio_metodin_parametrina/
+
+Koodista on takoituksella jätetty kommentit pois, jotta se pysyisi selkeänä.
+-tarkoituksella
