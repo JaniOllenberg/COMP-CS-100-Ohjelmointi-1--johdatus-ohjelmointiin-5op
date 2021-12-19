@@ -65,3 +65,21 @@ https://plus.tuni.fi/comp.cs.100/mooc/rounds_11/11_olio_metodin_parametrina/
 
 Koodista on takoituksella jätetty kommentit pois, jotta se pysyisi selkeänä.
 -tarkoituksella
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_13/13_tk_01_perusteet/
+
+kehittyneemmässä käyttöliittymien ohjelmonnissa etuja
+-ohjelmoinnissa
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_13/13_exercises_counter_assignment/
+
+The exact layout ypu can decide yourself
+-you
+
+the value of the counter increses
+-increases
+
+the value of the counter decreses
+-decreases
