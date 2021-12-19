@@ -83,3 +83,9 @@ the value of the counter increses
 
 the value of the counter decreses
 -decreases
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_13/13_tk_04_syotteet/
+
+Tkinter is flexible and converts the numerical valua
+-value
