@@ -89,3 +89,25 @@ https://plus.tuni.fi/comp.cs.100/mooc/rounds_13/13_tk_04_syotteet/
 
 Tkinter is flexible and converts the numerical valua
 -value
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_13/13_tk_05_kuvat/
+
+This is also thrue with Tkinter
+-true
+
+command=self.reaload
+  def reaload(self):
+-reload
+
+things look animated instead if a slideshow
+-of
+
+This program assumes the the following two images
+-that
+
+--------------------------------------------------------------------------------
+https://plus.tuni.fi/comp.cs.100/mooc/rounds_13/13_exercises_gui-projekti_assignment/
+
+the quantity of ource unit is in target units.
+-source

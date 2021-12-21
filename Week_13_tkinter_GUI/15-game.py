@@ -30,6 +30,7 @@ class GameGUI:
         self.__commands = [ ]
         for row in range(SIZE):
             self.__buttons.append([None] * SIZE)
+            print(self.__buttons)
             self.__commands.append([None] * SIZE)
 
         # In the beginning of the game the empty place is on
@@ -53,7 +54,7 @@ class GameGUI:
                 # The defined function needs to be stored for later use
                 # in the move_slate method.
                 self.__commands[y][x] = button_press
-
+                print(button_press)
                 # The last game piece is not created since there
                 # needs to be an empty place on the board.
                 if y == SIZE - 1 and x == SIZE - 1:

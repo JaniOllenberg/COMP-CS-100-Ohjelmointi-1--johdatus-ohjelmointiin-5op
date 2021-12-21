@@ -15,7 +15,7 @@ import time
 IMAGE_FILES = ["1S.gif", "2.gif", "3.gif", "4.gif", "5.gif", "6.gif"]
 
 WIN_POINTS = 50
-NR_OF_PLAYERS = 3
+NR_OF_PLAYERS = 10
 
 
 class Dicegame:
