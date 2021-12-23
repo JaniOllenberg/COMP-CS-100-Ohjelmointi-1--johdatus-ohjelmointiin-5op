@@ -7,8 +7,11 @@ Student ID: H288244
 from os import error
 from tkinter import *
 from datetime import datetime, timedelta
+import winsound
+
 # Import classes I've created
 from Excercise import Excercise
+import Select_User
 
 class GUI:
     def __init__(self, user_data, username):
@@ -112,10 +115,12 @@ class GUI:
                         return "error"
         return cumulative_timer
 
-    def write_data(self, data_type, data):
+    def write_data(self, data_type, data, time=0):
+        if time == 0:
+            time = datetime.now()
         file = open(self.__username+"_data.txt", mode="a")
         file.write("\n")
-        file.write(str(datetime.now())+';')
+        file.write(str(time)+';')
         file.write(str(data_type)+';')
         file.write(str(data))
         file.close()
@@ -127,6 +132,8 @@ class GUI:
     def current_timer(self):
         if self.__timer.is_running():
             self.__current_timer_label.configure(text=self.__timer.get_running_time())
+            if self.__timer.get_running_time() > timedelta(minutes=25):
+                winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
         self.__current_timer_label.after(10, self.current_timer)
 
     def start_timer(self):
@@ -141,18 +148,62 @@ class GUI:
             self.__work_timer_button.configure(state=NORMAL)
             self.__work_timer_stop["state"] = DISABLED
             self.__timer.stop()
+            time_now = datetime.now()
 
-            time_difference = datetime.now() - self.__timer.get_start_time()
+            # test for midnight
+            # seems to work fine
+            # time_now = datetime.now() + timedelta(days=1)
+            # print(time_now)
+
+            time_difference = time_now - self.__timer.get_start_time()
 
             # splice timer at midnight
-            if datetime.now().strftime('%Y-%m-%d') !=\
-                 self.__timer.get_start_time().strftime('%Y-%m-%d'):
-                 print("Timer started yesterday. Fixing logs.")
-                 
-            
+            if time_now.strftime('%Y-%m-%d') !=\
+                    self.__timer.get_start_time().strftime('%Y-%m-%d'):
+
+                print("Timer started yesterday. Fixing logs.")
+
+                midnight = datetime(year=time_now.year,
+                                    month=time_now.month,
+                                    day=time_now.day,
+                                    hour=0, minute=0, second=0, microsecond=0)
+                print(time_now - midnight)
+                midnight_next = datetime(year=time_now.year,
+                                        month=time_now.month,
+                                        day=time_now.day+1,
+                                        hour=0, minute=0,
+                                        second=0, microsecond=0)
+                print("until midnight:", midnight_next - time_now)
+                midnight_yesterday = datetime(year=time_now.year,
+                                month=time_now.month,
+                                day=time_now.day-1,
+                                hour=23, minute=59, second=59,
+                                microsecond=999999)
+
+                # record timer until midnight for yesterday
+                time_to_midnight = midnight_yesterday -\
+                                         self.__timer.get_start_time()
+                self.__cumulative_time += time_to_midnight
+                self.__user_data.append([midnight_yesterday,
+                                         "cumulative_timer",
+                                         self.__cumulative_time])            
+                self.write_data("cumulative_timer",
+                                self.__cumulative_time,
+                                midnight_yesterday)
+
+                # record timer from midnight
+                time_from_midnight = time_now - midnight
+                self.__cumulative_time = time_from_midnight
+                self.__user_data.append([time_now,
+                                         "cumulative_timer",
+                                         time_from_midnight])
+                self.write_data("cumulative_timer", time_from_midnight)
+                return
+
+            # use this if midnight wasn't during the timer run
             self.__cumulative_time += time_difference
             self.__cumulative_time_label["text"] = self.__cumulative_time
-            self.__user_data.append([datetime.now(),
+            self.__user_data.append([time_now,
                                      "cumulative_timer",
                                      self.__cumulative_time])
             self.write_data("cumulative_timer", self.__cumulative_time)
@@ -231,7 +282,8 @@ class Timer:
             return "Timer not running."
 
 def select_user():
-    return "Jani Ollenberg"
+    user = Select_User.Select_user_GUI()
+    return user.get_user()
 
 def read_data(username):
     data = open(username + "_data.txt", mode="r")
@@ -247,6 +299,7 @@ def read_data(username):
 
 def main():
     username = select_user()
+    print(username)
     user_data = read_data(username)
     GUI(user_data, username)
 

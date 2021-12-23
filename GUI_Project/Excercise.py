@@ -15,10 +15,13 @@ class Excercise:
     def get_todays_total(self, data):
         sum = 0
         for line in data:
-            if line[1] == self.__excercise_type:
-                day = line[0].split(" ")
-                if day[0] == datetime.today().strftime("%Y-%m-%d"):
-                    sum += int(line[2])
+            try:
+                if line[1] == self.__excercise_type:
+                    day = line[0].split(" ")
+                    if day[0] == datetime.today().strftime("%Y-%m-%d"):
+                        sum += int(line[2])
+            except:
+                sum = "error"
         return sum
 
     # def add(self, gui):
