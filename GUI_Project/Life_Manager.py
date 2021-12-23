@@ -88,7 +88,7 @@ class GUI:
         self.__averages_label = Button(text="Daily\nAverage",
                                        command=self.update_averages)
         self.__averages_label.grid(row=3, column=4)
-        self.__timer_daily_average = Label(text="work timer")
+        self.__timer_daily_average = Label(text=self.daily_average("cumulative_timer"))
         self.__timer_daily_average.grid(row=4, column=4)
         self.__pushups_daily_average = Label(text=self.daily_average("pushups"))
         self.__pushups_daily_average.grid(row=6, column=4)
@@ -115,19 +115,43 @@ class GUI:
         previous_day = None
         daily_sum = 0
         daily_sums_list = []
+        last_cumulative_list = []
+        last_cumulative = None
         number_of_new_days = 0
         for line in self.__user_data:
             day, timestamp = line[0].split(" ")
             if day != previous_day: # a new day
                 previous_day = day
                 number_of_new_days += 1
-                daily_sums_list.append(daily_sum)
-                daily_sum = 0
+                if event == "cumulative_timer":
+                    last_cumulative_list.append(last_cumulative)
+                else:
+                    daily_sums_list.append(daily_sum)
+                    daily_sum = 0
             if line[1] == event:
-                daily_sum += int(line[2])
-        daily_sums_list.append(daily_sum)
-        average = sum(daily_sums_list) / (number_of_new_days)
-        return average
+                if event == "cumulative_timer":
+                    last_cumulative = line[2]
+                else:    
+                    daily_sum += int(line[2])
+        if event == "cumulative_timer":
+            print(last_cumulative_list)
+            last_cumulative_list.pop(0)
+            print(last_cumulative_list)
+            timedelta_list = []
+            for timer in last_cumulative_list:
+                hours, minutes, seconds = timer.split(":")
+                seconds, microseconds = seconds.split(".")
+                timer_timedelta = timedelta(hours=int(hours),
+                                            minutes=int(minutes),
+                                            seconds=int(seconds))
+                timedelta_list.append(timer_timedelta)
+            return (sum(timedelta_list, timedelta()) / len(timedelta_list))
+        else: # for excercises
+            daily_sums_list.append(daily_sum)
+            daily_sums_list.pop(0)
+            print(daily_sums_list)
+            average = sum(daily_sums_list) / (number_of_new_days)
+            return average
 
     def get_todays_cumulative(self):
         cumulative_timer = timedelta(0)
