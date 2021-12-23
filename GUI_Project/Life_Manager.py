@@ -84,6 +84,19 @@ class GUI:
         self.__squats_total_today = Label(text=self.__squats.get_todays_total(user_data))
         self.__squats_total_today.grid(row=8, column=3)
 
+        # averages
+        self.__averages_label = Button(text="Daily\nAverage",
+                                       command=self.update_averages)
+        self.__averages_label.grid(row=3, column=4)
+        self.__timer_daily_average = Label(text="work timer")
+        self.__timer_daily_average.grid(row=4, column=4)
+        self.__pushups_daily_average = Label(text=self.daily_average("pushups"))
+        self.__pushups_daily_average.grid(row=6, column=4)
+        self.__pullups_daily_average = Label(text=self.daily_average("pullups"))
+        self.__pullups_daily_average.grid(row=7, column=4)
+        self.__squats_daily_average = Label(text=self.daily_average("squats"))
+        self.__squats_daily_average.grid(row=8, column=4)
+
         # self.__cumulative_time = timedelta(0)
         self.__cumulative_time = self.get_todays_cumulative()
         # "error" returned if daily timer is over 24hrs
@@ -94,6 +107,27 @@ class GUI:
         self.current_timer()
         self.todays_working_time()
         self.__mainWindow.mainloop()
+    
+    def update_averages(self):
+        print("update")
+
+    def daily_average(self, event):
+        previous_day = None
+        daily_sum = 0
+        daily_sums_list = []
+        number_of_new_days = 0
+        for line in self.__user_data:
+            day, timestamp = line[0].split(" ")
+            if day != previous_day: # a new day
+                previous_day = day
+                number_of_new_days += 1
+                daily_sums_list.append(daily_sum)
+                daily_sum = 0
+            if line[1] == event:
+                daily_sum += int(line[2])
+        daily_sums_list.append(daily_sum)
+        average = sum(daily_sums_list) / (number_of_new_days)
+        return average
 
     def get_todays_cumulative(self):
         cumulative_timer = timedelta(0)
@@ -127,11 +161,12 @@ class GUI:
 
     def clock(self):
         self.__clock.configure(text=datetime.now())
-        self.__clock.after(1, self.clock)
+        self.__clock.after(1000, self.clock)
 
     def current_timer(self):
         if self.__timer.is_running():
             self.__current_timer_label.configure(text=self.__timer.get_running_time())
+            # play ringer alarm after 25mins
             if self.__timer.get_running_time() > timedelta(minutes=25):
                 winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
         self.__current_timer_label.after(10, self.current_timer)
@@ -286,7 +321,12 @@ def select_user():
     return user.get_user()
 
 def read_data(username):
-    data = open(username + "_data.txt", mode="r")
+    try:
+        data = open(username + "_data.txt", mode="r")
+    except: # if file doesnt exist create it and open again for reading
+        data = open(username + "_data.txt", mode="w")
+        data.close()
+        data = open(username + "_data.txt", mode="r")
     data_lines = data.readlines()
     data.close()
     data_list = []
