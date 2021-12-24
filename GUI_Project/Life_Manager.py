@@ -8,6 +8,7 @@ from os import error
 from tkinter import *
 from datetime import datetime, timedelta
 import winsound
+import threading
 
 # Import classes I've created
 from Excercise import Excercise
@@ -24,6 +25,10 @@ class GUI:
         self.__username = username
 
         self.__timer = Timer()
+
+        # flags for playing alarm sound. These are needed for the sound thread.
+        self.__play_alarm = False
+        self.__alarm_playing = False
 
         self.__clock = Label(self.__mainWindow)
         self.__clock.grid()
@@ -53,6 +58,13 @@ class GUI:
 
         self.__cumulative_time_label = Label(self.__mainWindow)
         self.__cumulative_time_label.grid(row=4, column=1)
+
+        # break timer
+        self.__break_timer = Timer()
+        self.__break_timer_button = Button(text="Break Timer", command=self.break_timer)
+        self.__break_timer_button.grid(row=2, column=2)
+        self.__break_timer_label = Label(text="5 minutes")
+        self.__break_timer_label.grid(row=3, column=2)
 
         # Excercising
         self.__excercise_label = Label(text="Excercise:")
@@ -90,11 +102,11 @@ class GUI:
         self.__averages_label.grid(row=3, column=4)
         self.__timer_daily_average = Label(text=self.daily_average("cumulative_timer"))
         self.__timer_daily_average.grid(row=4, column=4)
-        self.__pushups_daily_average = Label(text=self.daily_average("pushups"))
+        self.__pushups_daily_average = Label(text=f'{self.daily_average("pushups"):.2f}')
         self.__pushups_daily_average.grid(row=6, column=4)
-        self.__pullups_daily_average = Label(text=self.daily_average("pullups"))
+        self.__pullups_daily_average = Label(text=f'{self.daily_average("pullups"):.2f}')
         self.__pullups_daily_average.grid(row=7, column=4)
-        self.__squats_daily_average = Label(text=self.daily_average("squats"))
+        self.__squats_daily_average = Label(text=f'{self.daily_average("squats"):.2f}')
         self.__squats_daily_average.grid(row=8, column=4)
 
         # self.__cumulative_time = timedelta(0)
@@ -105,11 +117,29 @@ class GUI:
 
         self.clock()
         self.current_timer()
+        self.current_break_timer()
         self.todays_working_time()
         self.__mainWindow.mainloop()
     
+    def break_timer(self):
+        self.__play_alarm = True
+        self.__break_timer.reverse_start()
+        self.__break_timer_button.configure(text="Stop break",
+                                            command=self.stop_break)
+
+    def stop_break(self):
+        self.__play_alarm = False
+        self.__break_timer.stop()
+        self.__break_timer_button.configure(text="Break Timer",
+                                            command=self.break_timer)
+        # self.__break_timer_label["text"] = "5 minutes"
+    
     def update_averages(self):
         print("update")
+        self.__timer_daily_average["text"] = self.daily_average("cumulative_timer")
+        self.__pushups_daily_average["text"] = f'{self.daily_average("pushups"):.2f}'
+        self.__pullups_daily_average["text"] = f'{self.daily_average("pullups"):.2f}'
+        self.__squats_daily_average["text"] = f'{self.daily_average("squats"):.2f}'
 
     def daily_average(self, event):
         previous_day = None
@@ -133,12 +163,16 @@ class GUI:
                     last_cumulative = line[2]
                 else:    
                     daily_sum += int(line[2])
+
+        # calculate average from dailies list            
+        last_cumulative_list.append(last_cumulative) # add last day also
         if event == "cumulative_timer":
             print(last_cumulative_list)
             last_cumulative_list.pop(0)
             print(last_cumulative_list)
             timedelta_list = []
             for timer in last_cumulative_list:
+                timer = str(timer)
                 hours, minutes, seconds = timer.split(":")
                 seconds, microseconds = seconds.split(".")
                 timer_timedelta = timedelta(hours=int(hours),
@@ -191,11 +225,42 @@ class GUI:
         if self.__timer.is_running():
             self.__current_timer_label.configure(text=self.__timer.get_running_time())
             # play ringer alarm after 25mins
-            if self.__timer.get_running_time() > timedelta(minutes=25):
-                winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
+            if self.__timer.get_running_time() > timedelta(minutes=0, seconds=5):
+                if self.__timer.is_running() and not self.__alarm_playing:
+                    if self.__play_alarm == True:
+                        thread_for_sound = threading.Thread(target=self.play_sound)
+                        thread_for_sound.start()
+                        self.__alarm_playing = True
+                # winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
         self.__current_timer_label.after(10, self.current_timer)
 
+    def current_break_timer(self):
+        if self.__break_timer.is_running():
+            time_left = self.__break_timer.get_reverse_end_time() - datetime.now()
+            overtime = False
+            if time_left < timedelta(0):
+                time_left = self.__break_timer.get_running_time()
+                overtime = True
+            # self.__break_timer_label.configure(text=self.__break_timer.get_running_time())
+            self.__break_timer_label.configure(text=time_left, fg="green")
+            if overtime == True:
+                self.__break_timer_label.configure(fg="red")
+            # play ringer alarm after 5mins
+            if self.__break_timer.get_running_time() > timedelta(minutes=0, seconds=5):
+                if self.__break_timer.is_running() and not self.__alarm_playing:
+                    if self.__play_alarm:
+                        self.__sound_thread = threading.Thread(target=self.play_sound)
+                        self.__sound_thread.start()
+                        self.__alarm_playing = True
+                # winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
+        self.__break_timer_label.after(10, self.current_break_timer)
+
+    def play_sound(self, filename="ringer_alarm.wav"):
+        winsound.PlaySound(filename, winsound.SND_FILENAME)
+        self.__alarm_playing = False
+    
     def start_timer(self):
+        self.__play_alarm = True
         start_time = datetime.now()
         self.__work_timer_label.configure(text=start_time)
         self.__work_timer_button.configure(state=DISABLED)
@@ -203,6 +268,7 @@ class GUI:
         self.__work_timer_stop["state"] = NORMAL
 
     def stop_timer(self):
+        self.__play_alarm = False
         if self.__timer.is_running():
             self.__work_timer_button.configure(state=NORMAL)
             self.__work_timer_stop["state"] = DISABLED
@@ -243,7 +309,7 @@ class GUI:
                 time_to_midnight = midnight_yesterday -\
                                          self.__timer.get_start_time()
                 self.__cumulative_time += time_to_midnight
-                self.__user_data.append([midnight_yesterday,
+                self.__user_data.append([str(midnight_yesterday),
                                          "cumulative_timer",
                                          self.__cumulative_time])            
                 self.write_data("cumulative_timer",
@@ -253,7 +319,7 @@ class GUI:
                 # record timer from midnight
                 time_from_midnight = time_now - midnight
                 self.__cumulative_time = time_from_midnight
-                self.__user_data.append([time_now,
+                self.__user_data.append([str(time_now),
                                          "cumulative_timer",
                                          time_from_midnight])
                 self.write_data("cumulative_timer", time_from_midnight)
@@ -262,7 +328,7 @@ class GUI:
             # use this if midnight wasn't during the timer run
             self.__cumulative_time += time_difference
             self.__cumulative_time_label["text"] = self.__cumulative_time
-            self.__user_data.append([time_now,
+            self.__user_data.append([str(time_now),
                                      "cumulative_timer",
                                      self.__cumulative_time])
             self.write_data("cumulative_timer", self.__cumulative_time)
@@ -286,7 +352,9 @@ class GUI:
         self.__user_data = read_data(self.__username)
         self.__pushups_total_today["text"] = self.__pushups.\
                                              get_todays_total(self.__user_data)
-    
+        self.__pushups_entry.delete(0, END)
+        self.__pushups_entry.insert(0, f"{amount} added")
+        
     def add_pullups(self):
         try:
             amount = int(self.__pullups_entry.get())
@@ -298,7 +366,8 @@ class GUI:
         self.__user_data = read_data(self.__username)
         self.__pullups_total_today["text"] = self.__pullups.\
                                              get_todays_total(self.__user_data)
-    
+        self.__pullups_entry.delete(0, END)
+
     def add_squats(self):
         try:
             amount = int(self.__squats_entry.get())
@@ -310,7 +379,8 @@ class GUI:
         self.__user_data = read_data(self.__username)
         self.__squats_total_today.configure(text=self.__squats.\
                                              get_todays_total(self.__user_data))
-        
+        self.__squats_entry.delete(0, END)
+
     def get_pushups_entry(self):
         return self.__pushups_entry.get()
           
@@ -340,6 +410,15 @@ class Timer:
         else:
             return "Timer not running."
 
+    def reverse_start(self):
+        plus_5_minutes = timedelta(minutes=5)
+        start_time = datetime.now()
+        self.__reverse_end_time = start_time + plus_5_minutes
+        self.start(start_time)
+
+    def get_reverse_end_time(self):
+        return self.__reverse_end_time
+    
 def select_user():
     user = Select_User.Select_user_GUI()
     return user.get_user()
