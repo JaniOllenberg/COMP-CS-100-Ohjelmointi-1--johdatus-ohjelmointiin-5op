@@ -20,6 +20,7 @@ class GUI:
         self.__mainWindow.title("Life Manager")
         self.__mainWindow.option_add("*Font", "Verdana 30")
 
+
         self.__user_data = user_data
         # print(self.__user_data)
         self.__username = username
@@ -31,16 +32,20 @@ class GUI:
         self.__alarm_playing = False
 
         self.__clock = Label(self.__mainWindow)
-        self.__clock.grid()
+        self.__clock.grid(row=0, column=0)
 
         self.__work_timer_label = Label(self.__mainWindow,
                                         text="Work Timer")
-        self.__work_timer_label.grid()
+        self.__work_timer_label.grid(row=1, column=0)
+
+        self.__work_timer_started_label = Label(self.__mainWindow, text="0:00:00.0000")
+        self.__work_timer_started_label.grid(row=1, column=1)
+        
         self.__work_timer_button = Button(self.__mainWindow,
                                           text="Start",
                                           command=self.start_timer,
                                           fg="#000fff000")
-        self.__work_timer_button.grid()
+        self.__work_timer_button.grid(row=2, column=0)
 
         self.__current_timer_label = Label(self.__mainWindow,
                                            text="0:00:00.00000")
@@ -50,7 +55,7 @@ class GUI:
                                         command=self.stop_timer,
                                         fg="red",
                                         state=DISABLED)
-        self.__work_timer_stop.grid()
+        self.__work_timer_stop.grid(row=3, column=0)
 
         self.__todays_working_time_label = Label(self.__mainWindow,
                                                  text="Total Work Time Today:")
@@ -68,8 +73,11 @@ class GUI:
 
         # Excercising
         self.__excercise_label = Label(text="Excercise:")
-        self.__excercise_label.grid(row=5, rowspan=4, column=0)
+        self.__excercise_label.grid(row=5, rowspan=4, column=0, sticky=E)
         
+        self.__excercise_added_label = Label(self.__mainWindow, text="Add +-number")
+        self.__excercise_added_label.grid(row=4,column=2)
+
         self.__pushups = Excercise("pushups")
         self.__pushups_label = Button(text="Pushups", command=self.add_pushups)
         # self.__pushups_entry = Entry()
@@ -115,12 +123,55 @@ class GUI:
         if self.__cumulative_time == "error":
             self.__cumulative_time_label["text"] = "Error in work timer, fix logs."
 
+        # display earned pomodoros for today
+        self.__earned_pomodoros_label = Label(self.__mainWindow,
+                                              text="Earned Pomodoros:")
+        self.__earned_pomodoros_label.grid(row=8, column=0)
+        self.__pomodoro_image = PhotoImage(file="pomodoro75pixels.png")
+        self.__earned_pomodoros = self.__cumulative_time // timedelta(minutes=25)
+        print(self.__earned_pomodoros)
+        self.__pomodoro_label = []
+
+        self.update_earned_pomodoros()
+
         self.clock()
         self.current_timer()
         self.current_break_timer()
         self.todays_working_time()
         self.__mainWindow.mainloop()
     
+    def update_earned_pomodoros(self):
+        self.__earned_pomodoros = self.__cumulative_time // timedelta(minutes=25)
+        print(self.__cumulative_time)
+        print(f"type self.__cumulative_time {type(self.__cumulative_time)}")
+        print(f"earned pomodoros {self.__earned_pomodoros}")
+        self.__pomodoro_label = []
+        for pomodoro in range(0,self.__earned_pomodoros):
+            print("updating pomodoros")
+            self.__pomodoro_label.append(Label(self.__mainWindow, 
+                                        image=self.__pomodoro_image))
+            if pomodoro < 5:
+                self.__pomodoro_label[pomodoro].grid(row=9+pomodoro, column=0)
+            if 4 < pomodoro < 10:
+                self.__pomodoro_label[pomodoro].grid(row=9+pomodoro-5, column=1)
+            if 9 < pomodoro < 15:
+                self.__pomodoro_label[pomodoro].grid(row=9+pomodoro-10, column=2)
+            if 14 < pomodoro < 20:
+                self.__pomodoro_label[pomodoro].grid(row=9+pomodoro-15, column=3)
+            if 19 < pomodoro < 24:
+                self.__pomodoro_label[pomodoro].grid(row=9+pomodoro-20, column=4)
+            if pomodoro > 23:
+                self.__pomodoro_label[pomodoro] = Label(self.__mainWindow,
+                                                        text=f"+{pomodoro-23}")
+                self.__pomodoro_label[pomodoro].grid(row=13, column=4)
+        print(len(self.__pomodoro_label))
+        print(self.__pomodoro_label)
+        if len(self.__pomodoro_label) == 0:
+            self.__pomodoro_label.append(Label(self.__mainWindow,
+                                               text="No Pomodoros Earned."))
+        self.__earned_pomodoros_label["text"] = f"Earned Pomodoros:     {self.__earned_pomodoros}"
+        self.__earned_pomodoros_label.after(10000, self.update_earned_pomodoros)
+
     def break_timer(self):
         self.__play_alarm = True
         self.__break_timer.reverse_start()
@@ -169,23 +220,29 @@ class GUI:
         if event == "cumulative_timer":
             print(last_cumulative_list)
             last_cumulative_list.pop(0)
+            last_cumulative_list.pop(0) #remove the initialization line
             print(last_cumulative_list)
             timedelta_list = []
-            for timer in last_cumulative_list:
-                timer = str(timer)
-                hours, minutes, seconds = timer.split(":")
-                seconds, microseconds = seconds.split(".")
-                timer_timedelta = timedelta(hours=int(hours),
-                                            minutes=int(minutes),
-                                            seconds=int(seconds))
-                timedelta_list.append(timer_timedelta)
-            return (sum(timedelta_list, timedelta()) / len(timedelta_list))
+            try:
+                for timer in last_cumulative_list:
+                    timer = str(timer)
+                    hours, minutes, seconds = timer.split(":")
+                    seconds, microseconds = seconds.split(".")
+                    timer_timedelta = timedelta(hours=int(hours),
+                                                minutes=int(minutes),
+                                                seconds=int(seconds))
+                    timedelta_list.append(timer_timedelta)
+                return (sum(timedelta_list, timedelta()) / len(timedelta_list))
+            except: return 0
         else: # for excercises
             daily_sums_list.append(daily_sum)
             daily_sums_list.pop(0)
+            daily_sums_list.pop(0) # remove initilization line
             print(daily_sums_list)
-            average = sum(daily_sums_list) / (number_of_new_days)
-            return average
+            try:
+                average = sum(daily_sums_list) / (number_of_new_days-1)
+                return average
+            except: return 0 # no data for any days
 
     def get_todays_cumulative(self):
         cumulative_timer = timedelta(0)
@@ -225,7 +282,7 @@ class GUI:
         if self.__timer.is_running():
             self.__current_timer_label.configure(text=self.__timer.get_running_time())
             # play ringer alarm after 25mins
-            if self.__timer.get_running_time() > timedelta(minutes=0, seconds=5):
+            if self.__timer.get_running_time() > timedelta(minutes=25):
                 if self.__timer.is_running() and not self.__alarm_playing:
                     if self.__play_alarm == True:
                         thread_for_sound = threading.Thread(target=self.play_sound)
@@ -246,7 +303,7 @@ class GUI:
             if overtime == True:
                 self.__break_timer_label.configure(fg="red")
             # play ringer alarm after 5mins
-            if self.__break_timer.get_running_time() > timedelta(minutes=0, seconds=5):
+            if self.__break_timer.get_running_time() > timedelta(minutes=5):
                 if self.__break_timer.is_running() and not self.__alarm_playing:
                     if self.__play_alarm:
                         self.__sound_thread = threading.Thread(target=self.play_sound)
@@ -262,7 +319,8 @@ class GUI:
     def start_timer(self):
         self.__play_alarm = True
         start_time = datetime.now()
-        self.__work_timer_label.configure(text=start_time)
+        time_to_display = start_time.strftime("%H:%M:%S")
+        self.__work_timer_started_label.configure(text=time_to_display)
         self.__work_timer_button.configure(state=DISABLED)
         self.__timer = Timer(start_time)
         self.__work_timer_stop["state"] = NORMAL
@@ -353,7 +411,7 @@ class GUI:
         self.__pushups_total_today["text"] = self.__pushups.\
                                              get_todays_total(self.__user_data)
         self.__pushups_entry.delete(0, END)
-        self.__pushups_entry.insert(0, f"{amount} added")
+        self.__excercise_added_label["text"] = f"Added {amount} pushups"
         
     def add_pullups(self):
         try:
@@ -367,6 +425,8 @@ class GUI:
         self.__pullups_total_today["text"] = self.__pullups.\
                                              get_todays_total(self.__user_data)
         self.__pullups_entry.delete(0, END)
+        text = f"Added {amount} pullups"
+        self.__excercise_added_label.configure(text=text)
 
     def add_squats(self):
         try:
@@ -380,6 +440,7 @@ class GUI:
         self.__squats_total_today.configure(text=self.__squats.\
                                              get_todays_total(self.__user_data))
         self.__squats_entry.delete(0, END)
+        self.__excercise_added_label.configure(text=f"Added {amount} squats")
 
     def get_pushups_entry(self):
         return self.__pushups_entry.get()
@@ -428,6 +489,7 @@ def read_data(username):
         data = open(username + "_data.txt", mode="r")
     except: # if file doesnt exist create it and open again for reading
         data = open(username + "_data.txt", mode="w")
+        data.write("0000-00-00 00:00:00.000000;cumulative_timer;0:00:00.000000")
         data.close()
         data = open(username + "_data.txt", mode="r")
     data_lines = data.readlines()
