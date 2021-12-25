@@ -34,6 +34,12 @@ class GUI:
         self.__clock = Label(self.__mainWindow)
         self.__clock.grid(row=0, column=0)
 
+        # Button to open minimal GUI to see timer on top of other windows
+        self.__minimal_gui_button = Button(self.__mainWindow,
+                                           text="Minimal GUI",
+                                           command=self.minimal_GUI)
+        self.__minimal_gui_button.grid(row=0,column=2)
+
         self.__work_timer_label = Label(self.__mainWindow,
                                         text="Work Timer")
         self.__work_timer_label.grid(row=1, column=0)
@@ -70,6 +76,21 @@ class GUI:
         self.__break_timer_button.grid(row=2, column=2)
         self.__break_timer_label = Label(text="5 minutes")
         self.__break_timer_label.grid(row=3, column=2)
+
+        self.__break_variable = IntVar()
+        self.__break_variable.set(5) # default to 5 minute break time
+        self.__break_5min_radiobutton = Radiobutton(self.__mainWindow,
+                                                    text="5 mins",
+                                                    variable=self.__break_variable,
+                                                    value=5,
+                                                    command=self.break_timer_length)
+        self.__break_5min_radiobutton.grid(row=2, column=3)
+        self.__break_15min_radiobutton = Radiobutton(self.__mainWindow,
+                                                     text="15 mins",
+                                                     variable=self.__break_variable,
+                                                     value=15,
+                                                     command=self.break_timer_length)
+        self.__break_15min_radiobutton.grid(row=2, column=4)
 
         # Excercising
         self.__excercise_label = Label(text="Excercise:")
@@ -140,14 +161,47 @@ class GUI:
         self.todays_working_time()
         self.__mainWindow.mainloop()
     
+    def minimal_GUI(self):
+        self.__minimal_GUI = Tk()
+        self.__minimal_GUI.title("Minimal GUI")
+        self.__minimal_GUI.option_add("*Font", "Verdana 16")
+        self.__minimal_GUI.geometry("+1600+850")
+        self.__minimal_timer = Label(self.__minimal_GUI, text="00:00:00.0000")
+        self.__minimal_timer.pack()
+
+        #window stays on top of everything
+        self.__minimal_GUI.wm_attributes("-topmost", 1)
+        # self.__minimal_GUI.resizable(False, False)
+        # self.__minimal_GUI.update_idletasks()
+        # self.__minimal_GUI.overrideredirect(True)
+        self.minimal_GUI_timer()
+        
+        self.__minimal_GUI.mainloop()
+
+    def minimal_GUI_timer(self):
+        if self.__timer.is_running():
+            print_timer = datetime(year=2021, month=12, day=25, hour=0, minute=0, second=0) + self.__timer.get_running_time()
+            print_timer = print_timer.strftime("%M:%S")
+            self.__minimal_timer.configure(text=print_timer)
+            # play ringer alarm after 25mins
+            if self.__timer.get_running_time() > timedelta(minutes=25):
+                if self.__timer.is_running() and not self.__alarm_playing:
+                    if self.__play_alarm == True:
+                        thread_for_sound = threading.Thread(target=self.play_sound)
+                        thread_for_sound.start()
+                        self.__alarm_playing = True
+                # winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
+        self.__minimal_timer.after(10, self.minimal_GUI_timer)
+
+    def break_timer_length(self):
+        self.__break_timer_length = self.__break_variable.get()
+        self.__break_timer_label.configure(text=f"{self.__break_timer_length} minutes")
+        
+    
     def update_earned_pomodoros(self):
         self.__earned_pomodoros = self.__cumulative_time // timedelta(minutes=25)
-        print(self.__cumulative_time)
-        print(f"type self.__cumulative_time {type(self.__cumulative_time)}")
-        print(f"earned pomodoros {self.__earned_pomodoros}")
         self.__pomodoro_label = []
         for pomodoro in range(0,self.__earned_pomodoros):
-            print("updating pomodoros")
             self.__pomodoro_label.append(Label(self.__mainWindow, 
                                         image=self.__pomodoro_image))
             if pomodoro < 5:
@@ -164,8 +218,6 @@ class GUI:
                 self.__pomodoro_label[pomodoro] = Label(self.__mainWindow,
                                                         text=f"+{pomodoro-23}")
                 self.__pomodoro_label[pomodoro].grid(row=13, column=4)
-        print(len(self.__pomodoro_label))
-        print(self.__pomodoro_label)
         if len(self.__pomodoro_label) == 0:
             self.__pomodoro_label.append(Label(self.__mainWindow,
                                                text="No Pomodoros Earned."))
@@ -174,7 +226,7 @@ class GUI:
 
     def break_timer(self):
         self.__play_alarm = True
-        self.__break_timer.reverse_start()
+        self.__break_timer.reverse_start(self.__break_variable.get())
         self.__break_timer_button.configure(text="Stop break",
                                             command=self.stop_break)
 
@@ -186,7 +238,6 @@ class GUI:
         # self.__break_timer_label["text"] = "5 minutes"
     
     def update_averages(self):
-        print("update")
         self.__timer_daily_average["text"] = self.daily_average("cumulative_timer")
         self.__pushups_daily_average["text"] = f'{self.daily_average("pushups"):.2f}'
         self.__pullups_daily_average["text"] = f'{self.daily_average("pullups"):.2f}'
@@ -218,10 +269,8 @@ class GUI:
         # calculate average from dailies list            
         last_cumulative_list.append(last_cumulative) # add last day also
         if event == "cumulative_timer":
-            print(last_cumulative_list)
             last_cumulative_list.pop(0)
             last_cumulative_list.pop(0) #remove the initialization line
-            print(last_cumulative_list)
             timedelta_list = []
             try:
                 for timer in last_cumulative_list:
@@ -238,7 +287,6 @@ class GUI:
             daily_sums_list.append(daily_sum)
             daily_sums_list.pop(0)
             daily_sums_list.pop(0) # remove initilization line
-            print(daily_sums_list)
             try:
                 average = sum(daily_sums_list) / (number_of_new_days-1)
                 return average
@@ -471,10 +519,10 @@ class Timer:
         else:
             return "Timer not running."
 
-    def reverse_start(self):
-        plus_5_minutes = timedelta(minutes=5)
+    def reverse_start(self, break_length):
+        extra_time = timedelta(minutes=break_length)
         start_time = datetime.now()
-        self.__reverse_end_time = start_time + plus_5_minutes
+        self.__reverse_end_time = start_time + extra_time
         self.start(start_time)
 
     def get_reverse_end_time(self):

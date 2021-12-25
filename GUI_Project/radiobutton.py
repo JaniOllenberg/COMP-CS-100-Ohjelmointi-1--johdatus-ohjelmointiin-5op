@@ -20,4 +20,15 @@ R3.pack( anchor = W)
 
 label = Label(root)
 label.pack()
+
+#window stays on top of everything
+root.wm_attributes("-topmost", 1)
+root.update_idletasks()
+# root.overrideredirect(True)
+new = Tk()
+new.wm_attributes("-topmost", 1)
+new.update_idletasks()
+new.overrideredirect(True)
+new.mainloop()
+
 root.mainloop()
