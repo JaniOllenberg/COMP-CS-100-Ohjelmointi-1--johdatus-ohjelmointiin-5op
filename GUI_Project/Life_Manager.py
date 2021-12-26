@@ -184,14 +184,14 @@ class GUI:
             print_timer = print_timer.strftime("%M:%S")
             self.__minimal_timer.configure(text=print_timer)
             # play ringer alarm after 25mins
-            if self.__timer.get_running_time() > timedelta(minutes=25):
-                if self.__timer.is_running() and not self.__alarm_playing:
-                    if self.__play_alarm == True:
-                        thread_for_sound = threading.Thread(target=self.play_sound)
-                        thread_for_sound.start()
-                        self.__alarm_playing = True
-                # winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
-        self.__minimal_timer.after(10, self.minimal_GUI_timer)
+            # if self.__timer.get_running_time() > timedelta(minutes=0, seconds= 5):
+            #     if self.__timer.is_running() and not self.__alarm_playing:
+            #         if self.__play_alarm == True:
+            #             thread_for_sound = threading.Thread(target=self.play_sound)
+            #             thread_for_sound.start()
+            #             self.__alarm_playing = True
+            #     # winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
+        self.__minimal_timer.after(1000, self.minimal_GUI_timer)
 
     def break_timer_length(self):
         self.__break_timer_length = self.__break_variable.get()
@@ -330,7 +330,7 @@ class GUI:
         if self.__timer.is_running():
             self.__current_timer_label.configure(text=self.__timer.get_running_time())
             # play ringer alarm after 25mins
-            if self.__timer.get_running_time() > timedelta(minutes=25):
+            if self.__timer.get_running_time() > timedelta(minutes=25, seconds=0):
                 if self.__timer.is_running() and not self.__alarm_playing:
                     if self.__play_alarm == True:
                         thread_for_sound = threading.Thread(target=self.play_sound)
@@ -351,7 +351,7 @@ class GUI:
             if overtime == True:
                 self.__break_timer_label.configure(fg="red")
             # play ringer alarm after 5mins
-            if self.__break_timer.get_running_time() > timedelta(minutes=5):
+            if self.__break_timer.get_running_time() > timedelta(minutes=self.__break_variable.get()):
                 if self.__break_timer.is_running() and not self.__alarm_playing:
                     if self.__play_alarm:
                         self.__sound_thread = threading.Thread(target=self.play_sound)
