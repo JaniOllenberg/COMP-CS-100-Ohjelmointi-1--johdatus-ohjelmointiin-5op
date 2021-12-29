@@ -1,6 +1,15 @@
 """
 COMP.CS.100 Programming 1
+
 Life Manager program to track good habits.
+    When starting you can select a user from dropdown menu or create a new one.
+    Continuing to the main window where you can see all the functionality of
+the program. It has a work timer which rings an alarm after 25 minutes and
+earns the user one pomodoro graphics to the bottom of the screen. Total time
+worked is counted together daily and displayed for motivation.
+    With radio button you can select 5 or 15 minute breaks. Countdown timer is
+reversed in the break timer.
+
 Name:   Jani Ollenberg
 Student ID: H288244
 """
@@ -183,14 +192,6 @@ class GUI:
             print_timer = datetime(year=2021, month=12, day=25, hour=0, minute=0, second=0) + self.__timer.get_running_time()
             print_timer = print_timer.strftime("%M:%S")
             self.__minimal_timer.configure(text=print_timer)
-            # play ringer alarm after 25mins
-            # if self.__timer.get_running_time() > timedelta(minutes=0, seconds= 5):
-            #     if self.__timer.is_running() and not self.__alarm_playing:
-            #         if self.__play_alarm == True:
-            #             thread_for_sound = threading.Thread(target=self.play_sound)
-            #             thread_for_sound.start()
-            #             self.__alarm_playing = True
-            #     # winsound.PlaySound("ringer_alarm.wav", winsound.SND_FILENAME)
         self.__minimal_timer.after(1000, self.minimal_GUI_timer)
 
     def break_timer_length(self):
