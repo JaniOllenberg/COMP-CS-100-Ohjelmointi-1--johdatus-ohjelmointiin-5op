@@ -9,6 +9,8 @@ earns the user one pomodoro graphics to the bottom of the screen. Total time
 worked is counted together daily and displayed for motivation.
     With radio button you can select 5 or 15 minute breaks. Countdown timer is
 reversed in the break timer.
+    In excercise section you can add 3 different excercises, pushups, pullups
+and squats.
 
 Name:   Jani Ollenberg
 Student ID: H288244
